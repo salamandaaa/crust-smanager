@@ -55,20 +55,28 @@ export async function filterFile(
   const groupInfo = context.groupInfo;
   try {
     const bn = cidToBigNumber(record.cid);
-    if (
-      groupInfo.totalMembers > 0 &&
-      !bn.mod(groupInfo.totalMembers).eq(groupInfo.nodeIndex)
-    ) {
+    //if (
+      //groupInfo.totalMembers > 0 &&
+      //!bn.mod(groupInfo.totalMembers).eq(groupInfo.nodeIndex)
+    //) {
+      //return 'nodeSkipped';
+    //}
+    let exist = await context.ipfsApi.exist(record.cid);
+    if (!exist) {
+      logger.info(`  ↪ 💥  file not exist locally, ignored: ${record.cid}`);
       return 'nodeSkipped';
+    }
+    else {
+      logger.info(`  ↪ 💥  file exist locally: ${record.cid}`);
     }
   } catch (ex) {
     return 'invalidCID';
   }
 
   const maxReplicas = strategey === 'newFilesWeight' ? 300 : 160;
-  if (!probabilityFilter(context, maxReplicas)) {
-    return 'pfSkipped';
-  }
+  //if (!probabilityFilter(context, maxReplicas)) {
+    //return 'pfSkipped';
+  //}
   const fileSizeInMb = bytesToMb(record.size);
   // check min file size limit
   if (config.minFileSize > 0 && fileSizeInMb < config.minFileSize) {
